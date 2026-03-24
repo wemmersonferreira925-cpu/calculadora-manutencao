@@ -1,22 +1,30 @@
 function calcular() {
-  let horas = document.getElementById("horas").value;
-  let resultado = document.getElementById("resultado");
+    let horas = document.getElementById("horas").value;
 
-  // Verifica se o campo está vazio
-  if (horas === "") {
-    resultado.innerText = "Digite as horas da máquina!";
-    return;
-  }
+    if (horas === "" || horas <= 0) {
+        document.getElementById("resultado").innerHTML = "Digite um valor válido!";
+        return;
+    }
 
-  horas = Number(horas);
+    horas = parseInt(horas);
 
-  if (horas < 250) {
-    resultado.innerText = "Próxima revisão: 250 horas";
-  } else if (horas < 500) {
-    resultado.innerText = "Próxima revisão: 500 horas";
-  } else if (horas < 1000) {
-    resultado.innerText = "Próxima revisão: 1000 horas (revisão mais completa)";
-  } else {
-    resultado.innerText = "Revisão geral necessária! Verificar todos os sistemas.";
-  }
+    let proximaTrocaOleo = Math.ceil(horas / 250) * 250;
+    let proximoFiltro = Math.ceil(horas / 500) * 500;
+
+    let alerta = "";
+
+    if (horas >= proximaTrocaOleo - 10) {
+        alerta += "⚠️ Atenção: Troca de óleo próxima!<br>";
+    }
+
+    if (horas >= proximoFiltro - 20) {
+        alerta += "⚠️ Atenção: Troca de filtro próxima!<br>";
+    }
+
+    document.getElementById("resultado").innerHTML = `
+        <p>🛢 Próxima troca de óleo: <strong>${proximaTrocaOleo}h</strong></p>
+        <p>🔧 Próxima troca de filtro: <strong>${proximoFiltro}h</strong></p>
+        <br>
+        ${alerta}
+    `;
 }
