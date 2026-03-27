@@ -1,317 +1,318 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SCM — Sistema de Controle de Manutenção</title>
+  <title>HEAVYTRACK — Controle de Manutenção de Máquinas Pesadas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
-          <path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/>
-        </svg>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="36" height="36" rx="7" fill="#E8A020"/>
+            <path d="M6 26h7l2-8h8l3 4" stroke="#1C1409" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 18l3-6h1l2 6" stroke="#1C1409" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="10" cy="27.5" r="2.5" fill="#1C1409"/>
+            <circle cx="22" cy="27.5" r="2.5" fill="#1C1409"/>
+            <rect x="6" y="27" width="19" height="1.5" rx="0.75" fill="#1C1409"/>
+          </svg>
+        </div>
+        <div>
+          <div class="logo-name">HEAVYTRACK</div>
+          <div class="logo-ver">Máquinas Pesadas · v3.0</div>
+        </div>
       </div>
-      <div>
-        <div class="logo-title">SCM</div>
-        <div class="logo-sub">v2.0</div>
-      </div>
+
+      <nav class="nav">
+        <button class="nav-btn active" data-page="dashboard">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+          Dashboard
+        </button>
+        <button class="nav-btn" data-page="frota">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H11a1 1 0 001-1v-1h3.05a2.5 2.5 0 014.9 0H19a1 1 0 001-1v-5a1 1 0 00-.293-.707l-3-3A1 1 0 0016 4H3z"/></svg>
+          Frota
+        </button>
+        <button class="nav-btn" data-page="calcular">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"/></svg>
+          Diagnóstico
+        </button>
+        <button class="nav-btn" data-page="historico">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+          Histórico
+        </button>
+        <button class="nav-btn" data-page="configuracoes">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+          Configurações
+        </button>
+      </nav>
     </div>
 
-    <nav class="sidebar-nav">
-      <button class="nav-item active" data-page="dashboard">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-        </svg>
-        <span>Dashboard</span>
-      </button>
-      <button class="nav-item" data-page="calcular">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-        </svg>
-        <span>Calcular</span>
-      </button>
-      <button class="nav-item" data-page="historico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
-        <span>Histórico</span>
-      </button>
-      <button class="nav-item" data-page="maquinas">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-          <line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
-        </svg>
-        <span>Máquinas</span>
-      </button>
-      <button class="nav-item" data-page="configuracoes">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </svg>
-        <span>Configurações</span>
-      </button>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="sidebar-footer-info">
-        <div class="footer-dot"></div>
-        <span>Sistema ativo</span>
+    <div class="sidebar-bottom">
+      <div class="status-dot-wrap">
+        <span class="status-dot"></span>
+        <span class="status-txt">Sistema operacional</span>
       </div>
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
   <main class="main">
-
-    <!-- TOPBAR -->
     <header class="topbar">
-      <div class="topbar-left">
-        <button class="menu-toggle" id="menuToggle">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </button>
-        <div class="topbar-breadcrumb">
-          <span id="pageTitle">Dashboard</span>
+      <div class="topbar-l">
+        <button class="ham" id="ham" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+        <div class="crumb">
+          <span class="crumb-pre">HEAVYTRACK /</span>
+          <span class="crumb-cur" id="pageTitle">DASHBOARD</span>
         </div>
       </div>
-      <div class="topbar-right">
-        <div class="topbar-date" id="topbarDate"></div>
-        <button class="topbar-btn" id="themeToggle" title="Alternar tema">
-          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
-            <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
-            <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-          </svg>
-          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-        </button>
+      <div class="topbar-r">
+        <div class="top-clock" id="topClock"></div>
+        <div class="top-badge" id="topBadge" style="display:none"></div>
       </div>
     </header>
 
-    <!-- PAGE: DASHBOARD -->
     <section class="page active" id="page-dashboard">
-      <div class="page-inner">
-        <div class="page-head">
-          <h1>Visão Geral</h1>
-          <p>Resumo do estado atual das manutenções cadastradas.</p>
-        </div>
-
-        <div class="kpi-grid" id="kpiGrid">
-          <!-- preenchido via JS -->
-        </div>
-
-        <div class="section-title">Alertas ativos</div>
-        <div class="alert-list" id="alertList">
-          <!-- preenchido via JS -->
-        </div>
-
-        <div class="section-title" style="margin-top:2rem">Máquinas cadastradas</div>
-        <div class="machine-grid" id="machineGrid">
-          <!-- preenchido via JS -->
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE: CALCULAR -->
-    <section class="page" id="page-calcular">
-      <div class="page-inner">
-        <div class="page-head">
-          <h1>Calcular Manutenção</h1>
-          <p>Insira o hodômetro atual para diagnosticar as próximas manutenções.</p>
-        </div>
-
-        <div class="calc-layout">
-          <div class="calc-left">
-            <div class="card">
-              <div class="card-label">Selecionar máquina</div>
-              <select class="form-select" id="calcMaquina">
-                <option value="">— Selecione —</option>
-              </select>
-
-              <div class="card-label" style="margin-top:1.25rem">Horas atuais da máquina</div>
-              <div class="input-row">
-                <input class="form-input mono" type="number" id="horasInput" placeholder="Ex: 1.250" min="0" step="1">
-                <span class="input-unit">h</span>
-              </div>
-
-              <button class="btn-primary" onclick="calcular()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                </svg>
-                Calcular diagnóstico
-              </button>
-            </div>
-
-            <div class="card" id="calcSummaryCard" style="display:none">
-              <div class="card-label">Resumo</div>
-              <div id="calcSummary"></div>
-            </div>
-          </div>
-
-          <div class="calc-right">
-            <div id="calcResultado">
-              <div class="empty-state">
-                <div class="empty-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="20" height="20">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                  </svg>
-                </div>
-                <div class="empty-text">Nenhum diagnóstico gerado ainda.</div>
-                <div class="empty-sub">Preencha os campos ao lado e clique em calcular.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE: HISTÓRICO -->
-    <section class="page" id="page-historico">
-      <div class="page-inner">
-        <div class="page-head">
-          <h1>Histórico</h1>
-          <p>Registro de diagnósticos anteriores realizados no sistema.</p>
-        </div>
-        <div id="historicoList">
-          <div class="empty-state">
-            <div class="empty-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="20" height="20">
-                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-              </svg>
-            </div>
-            <div class="empty-text">Nenhum diagnóstico no histórico.</div>
-            <div class="empty-sub">Após calcular, os registros aparecerão aqui.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE: MÁQUINAS -->
-    <section class="page" id="page-maquinas">
-      <div class="page-inner">
-        <div class="page-head" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+      <div class="pw">
+        <div class="ph">
           <div>
-            <h1>Máquinas</h1>
-            <p>Gerencie o cadastro de máquinas do sistema.</p>
+            <h1 class="h1">Painel de Controle</h1>
+            <p class="hsub">Monitoramento em tempo real da frota de equipamentos pesados</p>
           </div>
-          <button class="btn-primary" onclick="abrirModalMaquina()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="16" height="16">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Nova máquina
-          </button>
+          <div class="health-badge" id="healthBadge">—</div>
         </div>
-        <div class="table-wrap">
-          <table class="data-table" id="maquinasTable">
+        <div class="kpi-row" id="kpiRow"></div>
+        <div class="dash-grid">
+          <div>
+            <div class="sl">ALERTAS PRIORITÁRIOS</div>
+            <div id="dashAlertas"></div>
+          </div>
+          <div>
+            <div class="sl">FROTA ATIVA</div>
+            <div id="dashFrota"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-frota">
+      <div class="pw">
+        <div class="ph">
+          <div>
+            <h1 class="h1">Frota de Equipamentos</h1>
+            <p class="hsub">Cadastro e gestão de máquinas pesadas</p>
+          </div>
+          <button class="btn-add" onclick="abrirModal()">+ Novo equipamento</button>
+        </div>
+        <div class="tbl-shell">
+          <table class="tbl">
             <thead>
               <tr>
-                <th>ID</th><th>Nome</th><th>Setor</th><th>Horas cadastradas</th><th>Ações</th>
+                <th>TAG</th>
+                <th>Equipamento</th>
+                <th>Tipo</th>
+                <th>Fabricante</th>
+                <th>Horímetro</th>
+                <th>Obra / Local</th>
+                <th>Status</th>
+                <th>Ações</th>
               </tr>
             </thead>
-            <tbody id="maquinasBody"></tbody>
+            <tbody id="frotaBody"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- PAGE: CONFIGURAÇÕES -->
-    <section class="page" id="page-configuracoes">
-      <div class="page-inner">
-        <div class="page-head">
-          <h1>Configurações</h1>
-          <p>Personalize os intervalos de manutenção e parâmetros do sistema.</p>
+    <section class="page" id="page-calcular">
+      <div class="pw">
+        <div class="ph">
+          <div>
+            <h1 class="h1">Diagnóstico de Manutenção</h1>
+            <p class="hsub">Análise completa do horímetro e plano de manutenção preventiva</p>
+          </div>
         </div>
-
-        <div class="section-title">Intervalos de manutenção (horas)</div>
-        <div class="config-grid" id="configGrid"></div>
-
-        <div class="section-title" style="margin-top:2rem">Dados do sistema</div>
-        <div class="card" style="max-width:480px">
-          <div class="config-row">
-            <div>
-              <div class="config-row-label">Exportar dados</div>
-              <div class="config-row-sub">Baixe todos os registros em JSON</div>
+        <div class="diag-layout">
+          <div class="diag-left">
+            <div class="pblock">
+              <div class="plabel">SELECIONAR EQUIPAMENTO</div>
+              <select class="inp-sel" id="diagEquip"></select>
             </div>
-            <button class="btn-outline" onclick="exportarDados()">Exportar</button>
+            <div class="pblock" id="equipInfoBox" style="display:none">
+              <div class="plabel">DADOS DO EQUIPAMENTO</div>
+              <div id="equipInfo" class="equip-info-card"></div>
+            </div>
+            <div class="pblock">
+              <div class="plabel">HORÍMETRO ATUAL <span class="plabel-u">(horas)</span></div>
+              <div class="inp-grp">
+                <input class="inp-fld mono" type="number" id="diagHoras" placeholder="Ex: 4850" min="0" step="1">
+                <span class="inp-sfx">h</span>
+              </div>
+            </div>
+            <button class="btn-diag" onclick="calcular()">⚙ GERAR DIAGNÓSTICO</button>
+            <div class="pblock" id="diagSumBox" style="display:none">
+              <div class="plabel">RESUMO</div>
+              <div id="diagSum"></div>
+            </div>
           </div>
-          <div class="divider"></div>
-          <div class="config-row">
-            <div>
-              <div class="config-row-label">Limpar histórico</div>
-              <div class="config-row-sub">Remove todos os diagnósticos salvos</div>
+          <div class="diag-right" id="diagResult">
+            <div class="empty-st">
+              <div class="empty-ring"></div>
+              <div class="empty-title">Aguardando diagnóstico</div>
+              <div class="empty-sub">Selecione um equipamento e informe o horímetro</div>
             </div>
-            <button class="btn-danger" onclick="limparHistorico()">Limpar</button>
-          </div>
-          <div class="divider"></div>
-          <div class="config-row">
-            <div>
-              <div class="config-row-label">Restaurar padrões</div>
-              <div class="config-row-sub">Redefine intervalos para os valores originais</div>
-            </div>
-            <button class="btn-outline" onclick="restaurarPadroes()">Restaurar</button>
           </div>
         </div>
       </div>
     </section>
 
-  </main>
-
-  <!-- MODAL MÁQUINA -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title" id="modalTitle">Nova Máquina</div>
-        <button class="modal-close" onclick="fecharModal()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="18" height="18">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
+    <section class="page" id="page-historico">
+      <div class="pw">
+        <div class="ph">
+          <div>
+            <h1 class="h1">Histórico de Diagnósticos</h1>
+            <p class="hsub">Registro completo de todas as análises realizadas</p>
+          </div>
+          <button class="btn-outline-sm" onclick="limparHistorico()">Limpar histórico</button>
+        </div>
+        <div id="histList"></div>
       </div>
-      <div class="modal-body">
-        <input type="hidden" id="maqId">
-        <div class="form-group">
-          <label class="form-label">Nome da máquina</label>
-          <input class="form-input" type="text" id="maqNome" placeholder="Ex: Torno CNC 01">
+    </section>
+
+    <section class="page" id="page-configuracoes">
+      <div class="pw">
+        <div class="ph">
+          <div>
+            <h1 class="h1">Configurações</h1>
+            <p class="hsub">Intervalos de manutenção e parâmetros do sistema</p>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Setor</label>
-          <input class="form-input" type="text" id="maqSetor" placeholder="Ex: Produção A">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Horas atuais</label>
-          <div class="input-row">
-            <input class="form-input mono" type="number" id="maqHoras" placeholder="0" min="0">
-            <span class="input-unit">h</span>
+        <div class="sl">INTERVALOS DE MANUTENÇÃO (HORÍMETRO)</div>
+        <div class="cfg-grid" id="cfgGrid"></div>
+        <div class="sl" style="margin-top:2.5rem">SISTEMA</div>
+        <div class="cfg-sys">
+          <div class="cfg-row">
+            <div>
+              <div class="cfg-row-t">Exportar dados JSON</div>
+              <div class="cfg-row-s">Backup completo de frota, histórico e configurações</div>
+            </div>
+            <button class="btn-outline-sm" onclick="exportar()">Exportar</button>
+          </div>
+          <div class="cfg-div"></div>
+          <div class="cfg-row">
+            <div>
+              <div class="cfg-row-t">Restaurar intervalos padrão</div>
+              <div class="cfg-row-s">Redefine os intervalos para os valores de fábrica</div>
+            </div>
+            <button class="btn-outline-sm" onclick="restaurar()">Restaurar</button>
+          </div>
+          <div class="cfg-div"></div>
+          <div class="cfg-row">
+            <div>
+              <div class="cfg-row-t">Resetar sistema</div>
+              <div class="cfg-row-s">Remove todos os dados permanentemente</div>
+            </div>
+            <button class="btn-danger-sm" onclick="resetTotal()">Resetar tudo</button>
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn-outline" onclick="fecharModal()">Cancelar</button>
-        <button class="btn-primary" onclick="salvarMaquina()">Salvar</button>
+    </section>
+  </main>
+
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <div class="modal-head">
+        <span class="modal-title" id="modalTitle">Novo Equipamento</span>
+        <button class="modal-x" aria-label="Fechar modal" onclick="fecharModal()">✕</button>
       </div>
+      <form class="modal-body" id="formEquip" onsubmit="salvarEquip(event)">
+        <input type="hidden" id="mId">
+        <div class="fgrid" style="display: grid; gap: 15px; grid-template-columns: 1fr 1fr; width: 100%;">
+          
+          <div class="fg">
+            <label class="fl" for="mNome">Nome / Modelo *</label>
+            <input class="fi" type="text" id="mNome" placeholder="Ex: 320D2 GC" required>
+          </div>
+          
+          <div class="fg">
+            <label class="fl" for="mTipo">Tipo de equipamento *</label>
+            <select class="fi fsel" id="mTipo" required>
+              <option value="">— Selecione —</option>
+              <option>Escavadeira Hidráulica</option>
+              <option>Motoniveladora</option>
+              <option>Trator de Esteiras</option>
+              <option>Pá-Carregadeira</option>
+              <option>Retroescavadeira</option>
+              <option>Compactador / Rolo</option>
+              <option>Guindaste Sobre Esteiras</option>
+              <option>Perfuratriz</option>
+              <option>Britador Móvel</option>
+              <option>Caminhão Fora de Estrada</option>
+              <option>Caminhão Articulado</option>
+              <option>Scraper</option>
+            </select>
+          </div>
+
+          <div class="fg">
+            <label class="fl" for="mFab">Fabricante *</label>
+            <select class="fi fsel" id="mFab" required>
+              <option value="">— Selecione —</option>
+              <option>Caterpillar</option>
+              <option>Komatsu</option>
+              <option>XCMG</option>
+              <option>Volvo CE</option>
+              <option>John Deere</option>
+              <option>Liebherr</option>
+              <option>Hitachi</option>
+              <option>Case CE</option>
+              <option>JCB</option>
+              <option>Doosan</option>
+              <option>Hyundai CE</option>
+              <option>Sany</option>
+              <option>Terex</option>
+              <option>Manitowoc</option>
+            </select>
+          </div>
+
+          <div class="fg">
+            <label class="fl" for="mSerie">Série / Nº de série</label>
+            <input class="fi mono" type="text" id="mSerie" placeholder="Ex: CAT0320DAAABX01234">
+          </div>
+
+          <div class="fg">
+            <label class="fl" for="mTag">TAG / ID interno *</label>
+            <input class="fi mono" type="text" id="mTag" placeholder="Ex: ESCA-001" required>
+          </div>
+
+          <div class="fg">
+            <label class="fl" for="mHoras">Horímetro atual (h)</label>
+            <input class="fi mono" type="number" id="mHoras" placeholder="0" min="0">
+          </div>
+
+          <div class="fg fg-full" style="grid-column: span 2;">
+            <label class="fl" for="mObra">Obra / Local de operação</label>
+            <input class="fi" type="text" id="mObra" placeholder="Ex: Mineração Serra Norte — Pará">
+          </div>
+
+          <div class="fg fg-full" style="grid-column: span 2;">
+            <label class="fl" for="mObs">Observações</label>
+            <textarea class="fi ftxt" id="mObs" placeholder="Ex: Requer atenção especial ao sistema hidráulico..." style="min-height: 80px; resize: vertical;"></textarea>
+          </div>
+        </div>
+        
+        <div class="modal-foot" style="grid-column: span 2; display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+          <button type="button" class="btn-outline-sm" onclick="fecharModal()">Cancelar</button>
+          <button type="submit" class="btn-add">Salvar equipamento</button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
   <script src="script.js"></script>
