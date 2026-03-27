@@ -1,480 +1,556 @@
 /* ============================================================
-   SCM — Sistema de Controle de Manutenção
-   script.js
+   HEAVYTRACK — Controle de Manutenção de Máquinas Pesadas
+   script.js (Revisado e Otimizado)
    ============================================================ */
 
-/* ── DADOS PADRÃO ─────────────────────────────────────────── */
+/* ── MANUTENÇÕES PADRÃO (máquinas pesadas) ────────────────── */
 const MANUTENCOES_PADRAO = [
-  { id: 'm1', tipo: 'Troca de óleo',         descricao: 'Óleo de motor + filtro de óleo',    intervalo: 250  },
-  { id: 'm2', tipo: 'Filtros de ar',          descricao: 'Filtro primário e secundário',       intervalo: 300  },
-  { id: 'm3', tipo: 'Revisão de correias',    descricao: 'Correia dentada e de acessórios',   intervalo: 500  },
-  { id: 'm4', tipo: 'Sistema de arrefecimento', descricao: 'Líquido de arrefecimento',        intervalo: 750  },
-  { id: 'm5', tipo: 'Inspeção hidráulica',    descricao: 'Fluido hidráulico e mangueiras',    intervalo: 1000 },
-  { id: 'm6', tipo: 'Revisão de freios',      descricao: 'Pastilhas, discos e fluido',        intervalo: 1500 },
-  { id: 'm7', tipo: 'Revisão geral',          descricao: 'Todos os sistemas e componentes',   intervalo: 2000 },
+  // ── MOTOR ────────────────────────────────────────────────
+  { id: 'mp01', grupo: 'Motor', tipo: 'Troca de óleo do motor + filtros', descricao: 'Óleo SAE recomendado + filtro de óleo e separador de água', intervalo: 250 },
+  { id: 'mp02', grupo: 'Motor', tipo: 'Filtro de ar primário e secundário', descricao: 'Verificação e substituição do elemento filtrante de ar', intervalo: 500 },
+  { id: 'mp03', grupo: 'Motor', tipo: 'Correia do motor e tensores', descricao: 'Inspeção de desgaste e tensão; substituição se necessário', intervalo: 1000 },
+  { id: 'mp04', grupo: 'Motor', tipo: 'Líquido de arrefecimento (coolant)', descricao: 'Verificação de concentração e troca do líquido refrigerante', intervalo: 2000 },
+  { id: 'mp05', grupo: 'Motor', tipo: 'Ajuste de válvulas', descricao: 'Regulagem de folga entre válvulas conforme especificação OEM', intervalo: 2000 },
+  // ── SISTEMA HIDRÁULICO ───────────────────────────────────
+  { id: 'mp06', grupo: 'Hidráulico', tipo: 'Filtro retorno hidráulico', descricao: 'Troca do filtro de retorno do circuito hidráulico principal', intervalo: 500 },
+  { id: 'mp07', grupo: 'Hidráulico', tipo: 'Análise do óleo hidráulico', descricao: 'Coleta de amostra e análise laboratorial do fluido hidráulico', intervalo: 1000 },
+  { id: 'mp08', grupo: 'Hidráulico', tipo: 'Troca do óleo hidráulico + filtros', descricao: 'Substituição completa do fluido e filtros de alta pressão', intervalo: 2000 },
+  { id: 'mp09', grupo: 'Hidráulico', tipo: 'Vedações e mangueiras hidráulicas', descricao: 'Inspeção geral de mangueiras, conexões e vedações; reaperto', intervalo: 1000 },
+  // ── TREM DE FORÇA / TRANSMISSÃO ──────────────────────────
+  { id: 'mp10', grupo: 'Transmissão', tipo: 'Óleo da transmissão / caixa de câmbio', descricao: 'Troca do fluido de transmissão powershift / torque converter', intervalo: 1000 },
+  { id: 'mp11', grupo: 'Transmissão', tipo: 'Óleo diferencial / eixos', descricao: 'Substituição do óleo nos diferenciais e eixos traseiro/diant.', intervalo: 2000 },
+  { id: 'mp12', grupo: 'Transmissão', tipo: 'Filtros da transmissão', descricao: 'Troca do filtro de sucção e pressão da transmissão', intervalo: 1000 },
+  // ── TREM DE ROLAMENTO ─────────────────────────────────────
+  { id: 'mp13', grupo: 'Trem de Rolamento', tipo: 'Lubrificação dos roletes e rolos guia', descricao: 'Graxagem dos roletes de suporte, rolos guia e roda motriz', intervalo: 250 },
+  { id: 'mp14', grupo: 'Trem de Rolamento', tipo: 'Tensão e folga da esteira', descricao: 'Verificação e ajuste da tensão da esteira com graxeiro', intervalo: 500 },
+  { id: 'mp15', grupo: 'Trem de Rolamento', tipo: 'Inspeção pinos e buchas da esteira', descricao: 'Medição de desgaste de pinos, buchas e sapatas', intervalo: 2000 },
+  // ── FREIOS ────────────────────────────────────────────────
+  { id: 'mp16', grupo: 'Freios', tipo: 'Regulagem e inspeção dos freios', descricao: 'Freio de serviço e de estacionamento; desgaste de discos/lonas', intervalo: 500 },
+  { id: 'mp17', grupo: 'Freios', tipo: 'Fluido de freio (quando aplicável)', descricao: 'Verificação do nível e troca do fluido nos circuitos de freio', intervalo: 1000 },
+  // ── IMPLEMENTOS / ESTRUTURA ───────────────────────────────
+  { id: 'mp18', grupo: 'Implementos', tipo: 'Graxagem de pinos e articulações', descricao: 'Lubrificação de todos os pinos da lança, braço e caçamba', intervalo: 50 },
+  { id: 'mp19', grupo: 'Implementos', tipo: 'Inspeção estrutural de solda', descricao: 'Verificação de trincas, fissuras e deformações na estrutura', intervalo: 2000 },
+  { id: 'mp20', grupo: 'Implementos', tipo: 'Desgaste de dentes e lâminas', descricao: 'Medição e substituição de dentes, chanfros e lâmina de corte', intervalo: 1000 },
+  // ── ELÉTRICA / ELETRÔNICA ────────────────────────────────
+  { id: 'mp21', grupo: 'Elétrico', tipo: 'Bateria e sistema de carga', descricao: 'Teste de carga, densidade do eletrólito e limpeza dos terminais', intervalo: 500 },
+  { id: 'mp22', grupo: 'Elétrico', tipo: 'Sensores e módulos eletrônicos', descricao: 'Leitura de falhas ativas, atualização de firmware e calibrações', intervalo: 1000 },
+  // ── REVISÃO GERAL ─────────────────────────────────────────
+  { id: 'mp23', grupo: 'Revisão', tipo: 'Revisão geral / Major Overhaul', descricao: 'Revisão completa de todos os sistemas com inspeção OEM', intervalo: 6000 },
 ];
 
 /* ── ESTADO ───────────────────────────────────────────────── */
-let state = {
-  maquinas:     [],
-  historico:    [],
-  manutencoes:  [],
-  tema:         'light',
-  nextMaqId:    1,
-  nextHistId:   1,
+let S = {
+  frota:      [],
+  historico:  [],
+  mants:      [],
+  nextId:     1,
+  nextHistId: 1,
 };
 
-/* ── PERSISTÊNCIA ─────────────────────────────────────────── */
-function salvarState() {
-  try { localStorage.setItem('scm_state', JSON.stringify(state)); } catch(e) {}
+/* ── ÍCONES POR TIPO ──────────────────────────────────────── */
+const TIPO_ICON = {
+  'Escavadeira Hidráulica':   '⛏',
+  'Motoniveladora':           '🚜',
+  'Trator de Esteiras':       '🚛',
+  'Pá-Carregadeira':          '🏗',
+  'Retroescavadeira':         '🔧',
+  'Compactador / Rolo':       '⚙',
+  'Guindaste Sobre Esteiras': '🏚',
+  'Perfuratriz':              '⛏',
+  'Britador Móvel':           '💥',
+  'Caminhão Fora de Estrada': '🚚',
+  'Caminhão Articulado':      '🚚',
+  'Scraper':                  '🚧',
+};
+
+function tipoIcon(t) { return TIPO_ICON[t] || '⚙'; }
+
+/* ── PERSISTÊNCIA (Local Storage) ─────────────────────────── */
+function save() {
+  try { localStorage.setItem('ht_state', JSON.stringify(S)); } catch(e) { console.error("Erro ao salvar dados:", e); }
 }
 
-function carregarState() {
+function load() {
   try {
-    const s = localStorage.getItem('scm_state');
-    if (s) {
-      const parsed = JSON.parse(s);
-      state = { ...state, ...parsed };
-    }
-  } catch(e) {}
-
-  if (!state.manutencoes || state.manutencoes.length === 0) {
-    state.manutencoes = JSON.parse(JSON.stringify(MANUTENCOES_PADRAO));
+    const raw = localStorage.getItem('ht_state');
+    if (raw) S = { ...S, ...JSON.parse(raw) };
+  } catch(e) { console.error("Erro ao carregar dados:", e); }
+  
+  if (!S.mants || S.mants.length === 0) {
+    S.mants = JSON.parse(JSON.stringify(MANUTENCOES_PADRAO));
   }
-
-  if (!state.maquinas || state.maquinas.length === 0) {
-    state.maquinas = [
-      { id: 1, nome: 'Torno CNC 01',   setor: 'Produção A', horas: 1240 },
-      { id: 2, nome: 'Fresadora 02',    setor: 'Produção B', horas: 870  },
-      { id: 3, nome: 'Compressor AR',   setor: 'Utilidades', horas: 3540 },
-    ];
-    state.nextMaqId = 4;
-  }
+  if (!S.frota || S.frota.length === 0) seedFrota();
 }
 
-/* ── NAVEGAÇÃO ────────────────────────────────────────────── */
-const pageTitles = {
-  dashboard:     'Dashboard',
-  calcular:      'Calcular',
-  historico:     'Histórico',
-  maquinas:      'Máquinas',
-  configuracoes: 'Configurações',
-};
-
-function navegarPara(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-  const page = document.getElementById('page-' + pageId);
-  if (page) page.classList.add('active');
-
-  const nav = document.querySelector(`.nav-item[data-page="${pageId}"]`);
-  if (nav) nav.classList.add('active');
-
-  document.getElementById('pageTitle').textContent = pageTitles[pageId] || pageId;
-
-  // Fechar sidebar mobile
-  document.querySelector('.sidebar').classList.remove('open');
-
-  renderPage(pageId);
+function seedFrota() {
+  S.frota = [
+    { id:1, nome:'320D2 GC', tipo:'Escavadeira Hidráulica', fab:'Caterpillar', serie:'CAT0320DAAABX04892', tag:'ESCA-001', horas:4850, obra:'Mineração Serra Norte — Pará', obs:'' },
+    { id:2, nome:'PC210-11',  tipo:'Escavadeira Hidráulica', fab:'Komatsu',    serie:'KMTPC210M0023881',   tag:'ESCA-002', horas:2370, obra:'Rodovia BR-163 — Lote 04',    obs:'' },
+    { id:3, nome:'GD655-7',   tipo:'Motoniveladora',         fab:'Komatsu',    serie:'KMTGD6550071209',    tag:'MOTO-001', horas:6120, obra:'Aeroporto de Altamira',       obs:'Motor passa por análise de óleo periódica.' },
+    { id:4, nome:'XE370C',    tipo:'Escavadeira Hidráulica', fab:'XCMG',       serie:'XCMGXE370C00091234', tag:'ESCA-003', horas:1840, obra:'Usina Solar — Bahia',         obs:'' },
+    { id:5, nome:'D6T XW',    tipo:'Trator de Esteiras',     fab:'Caterpillar',serie:'CAT00D6TPJGA03301',  tag:'TRAT-001', horas:9340, obra:'Terraplanagem Zona Oeste',    obs:'Esteiras próximas do limite de desgaste.' },
+  ];
+  S.nextId = 6;
 }
 
-function renderPage(pageId) {
-  if (pageId === 'dashboard')     renderDashboard();
-  if (pageId === 'maquinas')      renderMaquinas();
-  if (pageId === 'historico')     renderHistorico();
-  if (pageId === 'configuracoes') renderConfiguracoes();
-  if (pageId === 'calcular')      renderCalcSelect();
+/* ── LÓGICA DE ALERTAS E MANUTENÇÃO ───────────────────────── */
+function gerarAlertas(horas) {
+  return S.mants.map(m => {
+    // Calcula o próximo múltiplo do intervalo baseado nas horas atuais
+    const prox = Math.ceil((horas === 0 ? 1 : horas) / m.intervalo) * m.intervalo;
+    const rest = prox - horas;
+    const pct  = rest / m.intervalo;
+    let status, label;
+
+    if (rest <= 0)        { status = 'urgent'; label = 'VENCIDO';  }
+    else if (pct <= 0.08) { status = 'urgent'; label = 'CRÍTICO';  }
+    else if (pct <= 0.20) { status = 'warn';   label = 'ATENÇÃO';  }
+    else                  { status = 'ok';     label = 'REGULAR';  }
+
+    return { ...m, prox, rest, status, label };
+  });
+}
+
+function todosAlertas() {
+  const lista = [];
+  S.frota.forEach(eq => {
+    gerarAlertas(eq.horas).forEach(a => {
+      // Ignora alertas "OK" para não encher a memória se a frota for muito grande
+      if(a.status !== 'ok') {
+        lista.push({ ...a, eqNome: eq.nome, eqTag: eq.tag, eqTipo: eq.tipo, eqId: eq.id });
+      }
+    });
+  });
+  return lista.sort((a,b) => a.rest - b.rest);
 }
 
 /* ── DASHBOARD ────────────────────────────────────────────── */
 function renderDashboard() {
-  const todos = gerarTodosAlertas();
+  const alertasAtivos = todosAlertas();
+  const criticos = alertasAtivos.filter(a => a.status === 'urgent').length;
+  const atencao  = alertasAtivos.filter(a => a.status === 'warn').length;
+  const total    = S.frota.length;
+  const diags    = S.historico.length;
 
-  const criticos = todos.filter(a => a.status === 'urgent').length;
-  const atencao  = todos.filter(a => a.status === 'warn').length;
-  const regulares = todos.filter(a => a.status === 'ok').length;
-  const totalMaq = state.maquinas.length;
-  const totalDiag = state.historico.length;
+  // Atualiza Health badge
+  const hb = document.getElementById('healthBadge');
+  if (criticos > 0) {
+    hb.textContent = `${criticos} CRÍTICO${criticos>1?'S':''}`;
+    hb.className = 'health-badge urgent';
+  } else if (atencao > 0) {
+    hb.textContent = `${atencao} ATENÇÃO`;
+    hb.className = 'health-badge warn';
+  } else {
+    hb.textContent = 'FROTA OK';
+    hb.className = 'health-badge ok';
+  }
 
-  document.getElementById('kpiGrid').innerHTML = `
-    <div class="kpi-card">
-      <div class="kpi-label">Máquinas</div>
-      <div class="kpi-value">${totalMaq}</div>
-      <div class="kpi-sub">cadastradas no sistema</div>
+  // Atualiza Top badge
+  const tb = document.getElementById('topBadge');
+  if (criticos > 0) {
+    tb.textContent = criticos + ' CRÍTICO' + (criticos>1?'S':'');
+    tb.style.display = 'block';
+  } else {
+    tb.style.display = 'none';
+  }
+
+  // Renderiza KPIs
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi ${total===0?'neutral':'info'}">
+      <div class="kpi-label">EQUIPAMENTOS</div>
+      <div class="kpi-value">${total}</div>
+      <div class="kpi-sub">na frota ativa</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Alertas críticos</div>
-      <div class="kpi-value" style="color: ${criticos > 0 ? 'var(--c-danger)' : 'var(--c-text)'}">${criticos}</div>
-      <div class="kpi-sub">manutenções vencidas</div>
+    <div class="kpi ${criticos>0?'urgent':'neutral'}">
+      <div class="kpi-label">CRÍTICOS</div>
+      <div class="kpi-value" style="color:${criticos>0?'var(--red)':'inherit'}">${criticos}</div>
+      <div class="kpi-sub">manutenções vencidas/urgentes</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Em atenção</div>
-      <div class="kpi-value" style="color: ${atencao > 0 ? 'var(--c-warn)' : 'var(--c-text)'}">${atencao}</div>
+    <div class="kpi ${atencao>0?'warn':'neutral'}">
+      <div class="kpi-label">EM ATENÇÃO</div>
+      <div class="kpi-value" style="color:${atencao>0?'var(--amber)':'inherit'}">${atencao}</div>
       <div class="kpi-sub">manutenções próximas</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Diagnósticos</div>
-      <div class="kpi-value">${totalDiag}</div>
+    <div class="kpi neutral">
+      <div class="kpi-label">DIAGNÓSTICOS</div>
+      <div class="kpi-value">${diags}</div>
       <div class="kpi-sub">realizados no histórico</div>
     </div>
   `;
 
-  const alertList = document.getElementById('alertList');
-  const alertas = todos.filter(a => a.status !== 'ok').slice(0, 6);
-
-  if (alertas.length === 0) {
-    alertList.innerHTML = `<div class="alert-item ok">
+  // Renderiza Lista de Alertas
+  const alertDiv = document.getElementById('dashAlertas');
+  const exibirAlertas = alertasAtivos.slice(0, 8); // Mostra apenas os 8 piores
+  
+  if (exibirAlertas.length === 0) {
+    alertDiv.innerHTML = `<div class="alert-item ok">
       <div class="alert-dot ok"></div>
       <div class="alert-body">
-        <div class="alert-tipo">Tudo em dia</div>
-        <div class="alert-meta">Nenhuma manutenção crítica ou em atenção no momento.</div>
+        <div class="alert-tipo">Todos os equipamentos em dia</div>
+        <div class="alert-meta">Nenhuma manutenção crítica ou em atenção.</div>
       </div>
       <div class="pill ok">OK</div>
     </div>`;
   } else {
-    alertList.innerHTML = alertas.map(a => `
+    alertDiv.innerHTML = exibirAlertas.map(a => `
       <div class="alert-item ${a.status}">
         <div class="alert-dot ${a.status}"></div>
         <div class="alert-body">
-          <div class="alert-tipo">${a.tipo} — ${a.maqNome}</div>
-          <div class="alert-meta">Próxima em ${fmtNum(a.proximaCiclo)}h · restam ${fmtNum(a.restante)}h (${a.maqSetor})</div>
+          <div class="alert-tipo">${esc(a.tipo)}</div>
+          <div class="alert-meta">${esc(a.eqTag)} · ${esc(a.eqNome)} · faltam ${fmt(a.rest)}h</div>
         </div>
         <div class="pill ${a.status}">${a.label}</div>
       </div>
     `).join('');
   }
 
-  const machineGrid = document.getElementById('machineGrid');
-  if (state.maquinas.length === 0) {
-    machineGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
-      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="20" height="20"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
-      <div class="empty-text">Nenhuma máquina cadastrada</div>
-      <div class="empty-sub">Acesse Máquinas para cadastrar.</div>
+  // Renderiza Frota Mini no Dashboard
+  const frotaDiv = document.getElementById('dashFrota');
+  if (S.frota.length === 0) {
+    frotaDiv.innerHTML = `<div class="alert-item ok" style="cursor:pointer" onclick="ir('frota')">
+      <div class="alert-body"><div class="alert-tipo">Nenhum equipamento cadastrado</div>
+      <div class="alert-meta">Clique para ir à Frota e cadastrar</div></div>
     </div>`;
   } else {
-    machineGrid.innerHTML = state.maquinas.map(m => {
-      const alertasMaq = gerarAlertas(m.horas);
-      const criticosMaq = alertasMaq.filter(a => a.status === 'urgent').length;
-      const atencaoMaq  = alertasMaq.filter(a => a.status === 'warn').length;
-      let statusCor = 'var(--c-ok)';
-      let statusTxt = 'Regular';
-      if (criticosMaq > 0) { statusCor = 'var(--c-danger)'; statusTxt = `${criticosMaq} crítico${criticosMaq > 1 ? 's' : ''}`; }
-      else if (atencaoMaq > 0) { statusCor = 'var(--c-warn)'; statusTxt = `${atencaoMaq} atenção`; }
-
-      return `<div class="machine-card" onclick="abrirCalcMaquina(${m.id})">
-        <div class="machine-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="16" height="16">
-            <rect x="2" y="7" width="20" height="14" rx="2"/>
-            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-            <line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
-          </svg>
+    frotaDiv.innerHTML = S.frota.map(eq => {
+      const als = gerarAlertas(eq.horas);
+      const cr  = als.filter(a => a.status === 'urgent').length;
+      const at  = als.filter(a => a.status === 'warn').length;
+      let sc = 'var(--green)', st = 'OK';
+      if (cr > 0) { sc = 'var(--red)'; st = cr+' CRIT.'; }
+      else if (at > 0) { sc = 'var(--amber)'; st = at+' ATEN.'; }
+      
+      return `<div class="frota-mini" onclick="abrirDiagEquip(${eq.id})">
+        <div class="frota-mini-icon">${tipoIcon(eq.tipo)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="frota-mini-nome">${esc(eq.nome)} <span style="font-size:11px;color:var(--text-3);font-family:var(--font-mono)">${esc(eq.tag)}</span></div>
+          <div class="frota-mini-tipo">${esc(eq.fab)} · ${esc(eq.tipo)}</div>
         </div>
-        <div class="machine-name">${escHtml(m.nome)}</div>
-        <div class="machine-setor">${escHtml(m.setor)}</div>
-        <div class="machine-horas">${fmtNum(m.horas)}h · <span style="color:${statusCor}">${statusTxt}</span></div>
+        <div>
+          <div class="frota-mini-h">${fmt(eq.horas)}h</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:${sc};text-align:right;margin-top:2px">${st}</div>
+        </div>
       </div>`;
     }).join('');
   }
 }
 
-/* ── CALCULAR ─────────────────────────────────────────────── */
-function renderCalcSelect() {
-  const sel = document.getElementById('calcMaquina');
-  sel.innerHTML = '<option value="">— Selecione —</option>' +
-    state.maquinas.map(m => `<option value="${m.id}">${escHtml(m.nome)} (${fmtNum(m.horas)}h)</option>`).join('');
-}
-
-function abrirCalcMaquina(id) {
-  navegarPara('calcular');
-  setTimeout(() => {
-    const maq = state.maquinas.find(m => m.id === id);
-    if (!maq) return;
-    document.getElementById('calcMaquina').value = id;
-    document.getElementById('horasInput').value = maq.horas;
-  }, 50);
-}
-
-document.addEventListener('change', e => {
-  if (e.target.id === 'calcMaquina') {
-    const maq = state.maquinas.find(m => m.id === parseInt(e.target.value));
-    if (maq) document.getElementById('horasInput').value = maq.horas;
-  }
-});
-
-function calcular() {
-  const horasRaw = document.getElementById('horasInput').value;
-  const horas = parseFloat(horasRaw);
-  const maqId = parseInt(document.getElementById('calcMaquina').value) || null;
-  const maq   = state.maquinas.find(m => m.id === maqId);
-
-  if (isNaN(horas) || horas < 0) {
-    mostrarToast('Insira um valor válido de horas.');
+/* ── FROTA ────────────────────────────────────────────────── */
+function renderFrota() {
+  const tbody = document.getElementById('frotaBody');
+  if (S.frota.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--text-3);font-family:var(--font-mono);font-size:12px">
+      Nenhum equipamento cadastrado. Clique em "+ Novo equipamento".
+    </td></tr>`;
     return;
   }
 
-  const resultados = gerarAlertas(horas);
+  tbody.innerHTML = S.frota.map(eq => {
+    const als = gerarAlertas(eq.horas);
+    const cr  = als.filter(a => a.status === 'urgent').length;
+    const at  = als.filter(a => a.status === 'warn').length;
+    let stHtml;
+    
+    if (cr > 0) stHtml = `<span class="pill urgent">${cr} CRÍTICO${cr>1?'S':''}</span>`;
+    else if (at > 0) stHtml = `<span class="pill warn">${at} ATENÇÃO</span>`;
+    else stHtml = `<span class="pill ok">REGULAR</span>`;
+
+    return `<tr>
+      <td><span class="tag-badge">${esc(eq.tag)||'—'}</span></td>
+      <td>
+        <div style="font-weight:600">${esc(eq.nome)}</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:2px;font-family:var(--font-mono)">${esc(eq.serie)||'—'}</div>
+      </td>
+      <td style="font-size:12px;color:var(--text-2)">${esc(eq.tipo)}</td>
+      <td><span class="fab-badge">${esc(eq.fab)}</span></td>
+      <td class="mono-td">${fmt(eq.horas)}h</td>
+      <td style="font-size:12px;color:var(--text-2);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(eq.obra)}">${esc(eq.obra)||'—'}</td>
+      <td>${stHtml}</td>
+      <td>
+        <div class="tbl-actions">
+          <button class="icon-btn" title="Diagnóstico" onclick="abrirDiagEquip(${eq.id})">⚙</button>
+          <button class="icon-btn" title="Editar" onclick="editarEquip(${eq.id})">✎</button>
+          <button class="icon-btn danger" title="Excluir" onclick="excluirEquip(${eq.id})">✕</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── MODAL DE CADASTRO ────────────────────────────────────── */
+function abrirModal() {
+  document.getElementById('formEquip').reset(); // Limpa o formulário todo de uma vez
+  document.getElementById('modalTitle').textContent = 'Novo Equipamento';
+  document.getElementById('mId').value = '';
+  document.getElementById('modalBg').classList.add('active'); // Ajustado para 'active' conforme CSS
+}
+
+function editarEquip(id) {
+  const eq = S.frota.find(e => e.id === id);
+  if (!eq) return;
+  document.getElementById('modalTitle').textContent = 'Editar Equipamento';
+  document.getElementById('mId').value    = eq.id;
+  document.getElementById('mNome').value  = eq.nome;
+  document.getElementById('mTipo').value  = eq.tipo;
+  document.getElementById('mFab').value   = eq.fab;
+  document.getElementById('mSerie').value = eq.serie;
+  document.getElementById('mTag').value   = eq.tag;
+  document.getElementById('mHoras').value = eq.horas;
+  document.getElementById('mObra').value  = eq.obra;
+  document.getElementById('mObs').value   = eq.obs;
+  document.getElementById('modalBg').classList.add('active');
+}
+
+function fecharModal() {
+  document.getElementById('modalBg').classList.remove('active');
+}
+
+// O event "e" vem do onsubmit no HTML. Previne o reload da página.
+function salvarEquip(e) {
+  if (e) e.preventDefault(); 
+
+  const id    = parseInt(document.getElementById('mId').value) || null;
+  const nome  = document.getElementById('mNome').value.trim();
+  const tipo  = document.getElementById('mTipo').value;
+  const fab   = document.getElementById('mFab').value;
+  const serie = document.getElementById('mSerie').value.trim();
+  const tag   = document.getElementById('mTag').value.trim().toUpperCase();
+  const horas = parseFloat(document.getElementById('mHoras').value) || 0;
+  const obra  = document.getElementById('mObra').value.trim();
+  const obs   = document.getElementById('mObs').value.trim();
+
+  // Validações de segurança extra (HTML5 required já cuida de parte disso)
+  if (!nome || !tipo || !fab || !tag) { 
+    toast('Preencha os campos obrigatórios.'); 
+    return; 
+  }
+
+  if (id) {
+    const eq = S.frota.find(e => e.id === id);
+    if (eq) Object.assign(eq, { nome, tipo, fab, serie, tag, horas, obra, obs });
+    toast('Equipamento atualizado.');
+  } else {
+    S.frota.push({ id: S.nextId++, nome, tipo, fab, serie, tag, horas, obra, obs });
+    toast('Equipamento cadastrado com sucesso.');
+  }
+
+  save();
+  fecharModal();
+  renderFrota();
+  // Se estiver no dashboard, precisa atualizar os alertas lá também
+  if (document.getElementById('page-dashboard').classList.contains('active')) {
+      renderDashboard();
+  }
+}
+
+function excluirEquip(id) {
+  const eq = S.frota.find(e => e.id === id);
+  if (!eq) return;
+  if (!confirm(`Excluir "${eq.nome} (${eq.tag})" da frota? Esta ação não pode ser desfeita.`)) return;
+  
+  S.frota = S.frota.filter(e => e.id !== id);
+  save();
+  renderFrota();
+  toast('Equipamento removido da frota.');
+}
+
+/* ── DIAGNÓSTICO ──────────────────────────────────────────── */
+function renderCalcSelect() {
+  const sel = document.getElementById('diagEquip');
+  sel.innerHTML = '<option value="">— Selecione o equipamento —</option>' +
+    S.frota.map(eq =>
+      `<option value="${eq.id}">${esc(eq.tag)} · ${esc(eq.nome)} (${fmt(eq.horas)}h)</option>`
+    ).join('');
+}
+
+// Listener para quando o usuário seleciona uma máquina na tela de Diagnóstico
+document.addEventListener('change', e => {
+  if (e.target.id === 'diagEquip') {
+    const eq = S.frota.find(x => x.id === parseInt(e.target.value));
+    const box = document.getElementById('equipInfoBox');
+    
+    if (eq) {
+      document.getElementById('diagHoras').value = eq.horas;
+      document.getElementById('equipInfo').innerHTML = `
+        <div class="eir"><span class="eir-k">Modelo</span><span class="eir-v">${esc(eq.nome)}</span></div>
+        <div class="eir"><span class="eir-k">Tipo</span><span class="eir-v">${esc(eq.tipo)}</span></div>
+        <div class="eir"><span class="eir-k">Fabricante</span><span class="eir-v">${esc(eq.fab)}</span></div>
+        <div class="eir"><span class="eir-k">Série</span><span class="eir-v">${esc(eq.serie||'—')}</span></div>
+        <div class="eir"><span class="eir-k">Obra / Local</span><span class="eir-v">${esc(eq.obra||'—')}</span></div>
+        ${eq.obs ? `<div style="margin-top:8px;padding:6px 8px;background:var(--amber-bg);border-radius:5px;border:1px solid var(--amber-border);font-size:11px;color:var(--amber)">${esc(eq.obs)}</div>` : ''}
+      `;
+      box.style.display = 'block';
+    } else {
+      box.style.display = 'none';
+      document.getElementById('diagHoras').value = '';
+    }
+  }
+});
+
+function abrirDiagEquip(id) {
+  ir('calcular');
+  setTimeout(() => {
+    document.getElementById('diagEquip').value = id;
+    document.getElementById('diagEquip').dispatchEvent(new Event('change'));
+  }, 50);
+}
+
+function calcular() {
+  const horasVal = document.getElementById('diagHoras').value;
+  const horas    = parseFloat(horasVal);
+  const eqId     = parseInt(document.getElementById('diagEquip').value) || null;
+  const eq       = S.frota.find(e => e.id === eqId);
+
+  if (!eq) { toast('Selecione um equipamento primeiro.'); return; }
+  if (isNaN(horas) || horas < 0) { toast('Informe um valor de horímetro válido.'); return; }
+
+  const resultados = gerarAlertas(horas).sort((a,b) => a.rest - b.rest);
   const criticos   = resultados.filter(r => r.status === 'urgent').length;
   const atencao    = resultados.filter(r => r.status === 'warn').length;
   const regulares  = resultados.filter(r => r.status === 'ok').length;
-  const proxima    = Math.min(...resultados.map(r => r.restante));
+  const proxima    = Math.min(...resultados.map(r => r.rest));
 
-  // Salvar no histórico
-  const registro = {
-    id:        state.nextHistId++,
-    maqNome:   maq ? maq.nome : 'Manual',
-    maqId:     maq ? maq.id : null,
+  // Atualiza as horas na frota e salva
+  eq.horas = horas;
+
+  // Salva no histórico
+  const reg = {
+    id:        S.nextHistId++,
+    eqNome:    eq.nome,
+    eqTag:     eq.tag,
+    eqId:      eq.id,
     horas,
     criticos,
     atencao,
     regulares,
-    data:      new Date().toLocaleString('pt-BR'),
-    resultados,
+    data:      new Date().toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }),
   };
 
-  state.historico.unshift(registro);
-  if (state.historico.length > 100) state.historico.pop();
+  S.historico.unshift(reg);
+  if (S.historico.length > 200) S.historico.pop(); // Mantém só os últimos 200 históricos
+  save();
 
-  // Atualizar horas da máquina
-  if (maq) {
-    maq.horas = horas;
-  }
-
-  salvarState();
-
-  // Summary
-  const summaryCard = document.getElementById('calcSummaryCard');
-  const summary     = document.getElementById('calcSummary');
-
-  summary.innerHTML = `
-    <div class="sum-row"><span>Hodômetro</span><span>${fmtNum(horas)}h</span></div>
-    <div class="sum-row"><span>Próxima ação</span><span>+${proxima}h</span></div>
-    <div class="sum-row"><span>Críticos</span><span style="color: var(--c-danger)">${criticos}</span></div>
-    <div class="sum-row"><span>Em atenção</span><span style="color: var(--c-warn)">${atencao}</span></div>
-    <div class="sum-row"><span>Regulares</span><span style="color: var(--c-ok)">${regulares}</span></div>
+  // Renderiza Resumo Lateral
+  const sumBox = document.getElementById('diagSumBox');
+  const sumDiv = document.getElementById('diagSum');
+  sumDiv.innerHTML = `
+    <div class="sum-row"><span>Horímetro atual</span><span>${fmt(horas)}h</span></div>
+    <div class="sum-row"><span>Próxima ação em</span><span>+${fmt(proxima)}h</span></div>
+    <div class="sum-row"><span>Críticos / Vencidos</span><span style="color:var(--red)">${criticos}</span></div>
+    <div class="sum-row"><span>Atenção (Próximos)</span><span style="color:var(--amber)">${atencao}</span></div>
+    <div class="sum-row"><span>Itens Regulares</span><span style="color:var(--green)">${regulares}</span></div>
   `;
+  sumBox.style.display = 'block';
 
-  summaryCard.style.display = 'block';
-
-  // Timeline
-  const resultDiv = document.getElementById('calcResultado');
-  resultDiv.innerHTML = `
-    <div class="card">
-      <div class="card-label">Diagnóstico completo — ${fmtNum(horas)}h</div>
-      <div class="timeline">
-        ${resultados
-          .sort((a,b) => a.restante - b.restante)
-          .map((r, i) => {
-            const pct = Math.min(100, Math.max(3, ((r.intervalo - r.restante) / r.intervalo) * 100));
-            return `
-              <div class="tl-item" style="animation-delay:${i * 0.04}s">
-                <div class="tl-rank">${i + 1}</div>
-                <div class="tl-dot ${r.status}"></div>
-                <div class="tl-body">
-                  <div class="tl-tipo">${escHtml(r.tipo)}</div>
-                  <div class="tl-desc">${escHtml(r.descricao)}</div>
-                  <div class="tl-horas">Próxima em ${fmtNum(r.proximaCiclo)}h · restam ${fmtNum(r.restante)}h</div>
-                  <div class="progress-bar-wrap">
-                    <div class="progress-bar ${r.status}" style="width:${pct}%"></div>
-                  </div>
-                </div>
-                <div class="pill ${r.status}">${r.label}</div>
-              </div>
-            `;
-          }).join('')}
-      </div>
-    </div>
-  `;
-
-  mostrarToast('Diagnóstico concluído com sucesso.');
-}
-
-/* ── GERAR ALERTAS ────────────────────────────────────────── */
-function gerarAlertas(horas) {
-  return state.manutencoes.map(m => {
-    const proximaCiclo = Math.ceil(horas / m.intervalo) * m.intervalo;
-    const restante     = proximaCiclo - horas;
-    const pct          = restante / m.intervalo;
-
-    let status, label;
-    if (restante === 0)       { status = 'urgent'; label = 'Agora';   }
-    else if (pct <= 0.10)     { status = 'urgent'; label = 'Crítico'; }
-    else if (pct <= 0.25)     { status = 'warn';   label = 'Atenção'; }
-    else                      { status = 'ok';     label = 'Regular'; }
-
-    return { ...m, proximaCiclo, restante, status, label };
+  // Agrupa Resultados por Categoria (Motor, Hidráulico, etc)
+  const grupos = {};
+  resultados.forEach(r => {
+    if (!grupos[r.grupo]) grupos[r.grupo] = [];
+    grupos[r.grupo].push(r);
   });
-}
 
-function gerarTodosAlertas() {
-  const lista = [];
-  state.maquinas.forEach(maq => {
-    gerarAlertas(maq.horas).forEach(a => {
-      lista.push({ ...a, maqNome: maq.nome, maqSetor: maq.setor, maqId: maq.id });
+  const eqNome = `${eq.tag} · ${eq.nome}`;
+  const eqFab  = eq.fab;
+
+  let tlHtml = '';
+  let idx = 0;
+  
+  Object.entries(grupos).forEach(([grp, items]) => {
+    tlHtml += `<div style="padding:8px 1.25rem;background:var(--bg-3);border-bottom:1px solid var(--border);font-family:var(--font-cond);font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--text-3)">${grp.toUpperCase()}</div>`;
+    
+    items.forEach(r => {
+      idx++;
+      const pct = Math.min(100, Math.max(2, ((r.intervalo - r.rest) / r.intervalo) * 100));
+      tlHtml += `
+        <div class="tl-item" style="animation-delay:${idx * 0.03}s">
+          <div class="tl-num">${idx}</div>
+          <div class="tl-dot ${r.status}"></div>
+          <div class="tl-body">
+            <div class="tl-tipo">${esc(r.tipo)}</div>
+            <div class="tl-desc">${esc(r.descricao)}</div>
+            <div class="tl-horas">Ciclo: ${fmt(r.intervalo)}h · Fazer com: ${fmt(r.prox)}h · Restam: ${fmt(r.rest)}h</div>
+            <div class="tl-bar-wrap">
+              <div class="tl-bar ${r.status}" style="width:${pct}%"></div>
+            </div>
+          </div>
+          <div class="pill ${r.status}">${r.label}</div>
+        </div>
+      `;
     });
   });
-  return lista.sort((a,b) => a.restante - b.restante);
+
+  // Renderiza no painel principal
+  document.getElementById('diagResult').innerHTML = `
+    <div class="diag-result-header">
+      <div>
+        <div class="drh-equip">${esc(eqNome)}</div>
+        <div class="drh-horas">${esc(eqFab)} · Horímetro atualizado: ${fmt(horas)}h</div>
+      </div>
+      <div class="pill ${criticos>0?'urgent':atencao>0?'warn':'ok'}">
+        ${criticos>0?criticos+' CRÍTICO'+(criticos>1?'S':''):atencao>0?atencao+' ATENÇÃO':'FROTA OK'}
+      </div>
+    </div>
+    <div class="tl">${tlHtml}</div>
+  `;
+
+  toast('Diagnóstico gerado e salvo!');
 }
 
 /* ── HISTÓRICO ────────────────────────────────────────────── */
 function renderHistorico() {
-  const div = document.getElementById('historicoList');
-
-  if (state.historico.length === 0) {
-    div.innerHTML = `<div class="empty-state">
-      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="20" height="20"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-      <div class="empty-text">Nenhum diagnóstico no histórico.</div>
-      <div class="empty-sub">Após calcular, os registros aparecerão aqui.</div>
+  const div = document.getElementById('histList');
+  if (S.historico.length === 0) {
+    div.innerHTML = `<div class="empty-st">
+      <div class="empty-ring"></div>
+      <div class="empty-title">Nenhum diagnóstico registrado</div>
+      <div class="empty-sub">Realize um diagnóstico em uma máquina para aparecer aqui.</div>
     </div>`;
     return;
   }
 
-  div.innerHTML = state.historico.map(h => `
+  div.innerHTML = S.historico.map(h => `
     <div class="hist-item">
       <div class="hist-num">${h.id}</div>
       <div class="hist-body">
-        <div class="hist-maq">${escHtml(h.maqNome)}</div>
-        <div class="hist-meta">${fmtNum(h.horas)}h · ${h.data}</div>
+        <div class="hist-equip">${esc(h.eqTag)} · ${esc(h.eqNome)}</div>
+        <div class="hist-meta">Horímetro na época: ${fmt(h.horas)}h · ${h.data}</div>
         <div class="hist-pills">
-          ${h.criticos > 0  ? `<div class="pill urgent">${h.criticos} crítico${h.criticos > 1 ? 's' : ''}</div>` : ''}
-          ${h.atencao  > 0  ? `<div class="pill warn">${h.atencao} atenção</div>` : ''}
-          ${h.regulares > 0 ? `<div class="pill ok">${h.regulares} regular${h.regulares > 1 ? 's' : ''}</div>` : ''}
+          ${h.criticos > 0  ? `<div class="pill urgent">${h.criticos} CRÍTICO${h.criticos>1?'S':''}</div>` : ''}
+          ${h.atencao  > 0  ? `<div class="pill warn">${h.atencao} ATENÇÃO</div>` : ''}
+          ${h.regulares > 0 ? `<div class="pill ok">${h.regulares} REGULAR${h.regulares>1?'IS':''}</div>` : ''}
         </div>
       </div>
-      <button class="btn-icon" onclick="removerHistorico(${h.id})" title="Remover">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="14" height="14">
-          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-          <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-        </svg>
-      </button>
+      <button class="icon-btn danger" onclick="removerHist(${h.id})" title="Remover" style="flex-shrink:0">✕</button>
     </div>
   `).join('');
 }
 
-function removerHistorico(id) {
-  state.historico = state.historico.filter(h => h.id !== id);
-  salvarState();
+function removerHist(id) {
+  S.historico = S.historico.filter(h => h.id !== id);
+  save();
   renderHistorico();
-  mostrarToast('Registro removido.');
 }
 
 function limparHistorico() {
-  if (!confirm('Deseja remover todos os diagnósticos do histórico?')) return;
-  state.historico = [];
-  salvarState();
+  if (!confirm('Deseja apagar TODO o histórico de diagnósticos?')) return;
+  S.historico = [];
+  save();
   renderHistorico();
-  mostrarToast('Histórico limpo.');
-}
-
-/* ── MÁQUINAS ─────────────────────────────────────────────── */
-function renderMaquinas() {
-  const tbody = document.getElementById('maquinasBody');
-
-  if (state.maquinas.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--c-text-2)">Nenhuma máquina cadastrada.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = state.maquinas.map(m => `
-    <tr>
-      <td class="mono">#${m.id}</td>
-      <td><strong>${escHtml(m.nome)}</strong></td>
-      <td>${escHtml(m.setor)}</td>
-      <td class="mono">${fmtNum(m.horas)}h</td>
-      <td>
-        <div style="display:flex; gap:6px;">
-          <button class="btn-icon" onclick="editarMaquina(${m.id})" title="Editar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="14" height="14">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-          </button>
-          <button class="btn-icon" onclick="abrirCalcMaquina(${m.id})" title="Calcular">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="14" height="14">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-          </button>
-          <button class="btn-icon" onclick="excluirMaquina(${m.id})" title="Excluir">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="14" height="14">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-              <path d="M10 11v6"/><path d="M14 11v6"/>
-            </svg>
-          </button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function abrirModalMaquina() {
-  document.getElementById('modalTitle').textContent = 'Nova Máquina';
-  document.getElementById('maqId').value    = '';
-  document.getElementById('maqNome').value  = '';
-  document.getElementById('maqSetor').value = '';
-  document.getElementById('maqHoras').value = '';
-  document.getElementById('modalOverlay').classList.add('open');
-}
-
-function editarMaquina(id) {
-  const m = state.maquinas.find(x => x.id === id);
-  if (!m) return;
-  document.getElementById('modalTitle').textContent = 'Editar Máquina';
-  document.getElementById('maqId').value    = m.id;
-  document.getElementById('maqNome').value  = m.nome;
-  document.getElementById('maqSetor').value = m.setor;
-  document.getElementById('maqHoras').value = m.horas;
-  document.getElementById('modalOverlay').classList.add('open');
-}
-
-function fecharModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
-}
-
-function salvarMaquina() {
-  const id    = parseInt(document.getElementById('maqId').value) || null;
-  const nome  = document.getElementById('maqNome').value.trim();
-  const setor = document.getElementById('maqSetor').value.trim();
-  const horas = parseFloat(document.getElementById('maqHoras').value);
-
-  if (!nome)           { mostrarToast('Informe o nome da máquina.'); return; }
-  if (!setor)          { mostrarToast('Informe o setor.'); return; }
-  if (isNaN(horas) || horas < 0) { mostrarToast('Informe um valor válido de horas.'); return; }
-
-  if (id) {
-    const m = state.maquinas.find(x => x.id === id);
-    if (m) { m.nome = nome; m.setor = setor; m.horas = horas; }
-    mostrarToast('Máquina atualizada.');
-  } else {
-    state.maquinas.push({ id: state.nextMaqId++, nome, setor, horas });
-    mostrarToast('Máquina cadastrada.');
-  }
-
-  salvarState();
-  fecharModal();
-  renderMaquinas();
-}
-
-function excluirMaquina(id) {
-  if (!confirm('Excluir esta máquina?')) return;
-  state.maquinas = state.maquinas.filter(m => m.id !== id);
-  salvarState();
-  renderMaquinas();
-  mostrarToast('Máquina excluída.');
+  toast('Histórico apagado.');
 }
 
 /* ── CONFIGURAÇÕES ────────────────────────────────────────── */
 function renderConfiguracoes() {
-  const grid = document.getElementById('configGrid');
-  grid.innerHTML = state.manutencoes.map(m => `
-    <div class="config-card">
-      <div class="config-card-label">${escHtml(m.tipo)}</div>
-      <div class="config-card-desc">${escHtml(m.descricao)}</div>
-      <div class="config-input-row">
-        <input class="config-input" type="number" min="10" step="10"
+  const grid = document.getElementById('cfgGrid');
+  grid.innerHTML = S.mants.map(m => `
+    <div class="cfg-card">
+      <div class="cfg-card-t">${esc(m.tipo)}</div>
+      <div class="cfg-card-s">${esc(m.grupo)} · ${esc(m.descricao)}</div>
+      <div class="cfg-inp-row">
+        <input class="cfg-inp" type="number" min="10" step="10"
           value="${m.intervalo}"
-          onchange="atualizarIntervalo('${m.id}', this.value)"
-          onblur="atualizarIntervalo('${m.id}', this.value)">
-        <span class="config-unit">h</span>
+          onchange="atualizarIntervalo('${m.id}', this.value)">
+        <span class="cfg-unit">h</span>
       </div>
     </div>
   `).join('');
@@ -483,88 +559,122 @@ function renderConfiguracoes() {
 function atualizarIntervalo(id, val) {
   const n = parseInt(val);
   if (isNaN(n) || n < 10) return;
-  const m = state.manutencoes.find(x => x.id === id);
-  if (m) { m.intervalo = n; salvarState(); mostrarToast('Intervalo atualizado.'); }
+  const m = S.mants.find(x => x.id === id);
+  if (m) { 
+    m.intervalo = n; 
+    save(); 
+    toast('Intervalo de horas atualizado.'); 
+  }
 }
 
-function restaurarPadroes() {
-  if (!confirm('Restaurar todos os intervalos para os valores padrão?')) return;
-  state.manutencoes = JSON.parse(JSON.stringify(MANUTENCOES_PADRAO));
-  salvarState();
+function restaurar() {
+  if (!confirm('Isto voltará todas as manutenções para os intervalos de fábrica originais. Continuar?')) return;
+  S.mants = JSON.parse(JSON.stringify(MANUTENCOES_PADRAO));
+  save();
   renderConfiguracoes();
-  mostrarToast('Intervalos restaurados.');
+  toast('Valores de fábrica restaurados.');
 }
 
-function exportarDados() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+function exportar() {
+  const blob = new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = `scm_dados_${Date.now()}.json`;
+  a.download = `heavytrack_backup_${new Date().toISOString().split('T')[0]}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  mostrarToast('Dados exportados.');
+  toast('Arquivo JSON exportado para download.');
 }
 
-/* ── TEMA ─────────────────────────────────────────────────── */
-function aplicarTema(tema) {
-  state.tema = tema;
-  document.documentElement.setAttribute('data-theme', tema);
-  salvarState();
+function resetTotal() {
+  if (!confirm('Atenção mecânico: Isso irá APAGAR TODAS AS MÁQUINAS e histórico! Deseja mesmo formatar o sistema?')) return;
+  localStorage.removeItem('ht_state');
+  location.reload();
 }
 
-document.getElementById('themeToggle').addEventListener('click', () => {
-  aplicarTema(state.tema === 'dark' ? 'light' : 'dark');
-});
+/* ── NAVEGAÇÃO ENTRE ABAS ─────────────────────────────────── */
+const PAGE_TITLES = {
+  dashboard:     'DASHBOARD DE CONTROLE',
+  frota:         'GESTÃO DE FROTA',
+  calcular:      'DIAGNÓSTICO E MANUTENÇÃO',
+  historico:     'HISTÓRICO DE REVISÕES',
+  configuracoes: 'CONFIGURAÇÕES DO SISTEMA',
+};
 
-/* ── DATA TOPBAR ──────────────────────────────────────────── */
-function atualizarData() {
+function ir(pageId) {
+  // Esconde todas as páginas e desmarca os botões
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+  // Mostra a página escolhida
+  const pg = document.getElementById('page-' + pageId);
+  if (pg) pg.classList.add('active');
+
+  const nb = document.querySelector(`.nav-btn[data-page="${pageId}"]`);
+  if (nb) nb.classList.add('active');
+
+  // Muda o título na barra superior
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[pageId] || pageId.toUpperCase();
+  
+  // Fecha o menu lateral no celular se estiver aberto
+  document.getElementById('sidebar').classList.remove('open');
+
+  // Roda a função específica de renderização daquela tela
+  if (pageId === 'dashboard')     renderDashboard();
+  if (pageId === 'frota')         renderFrota();
+  if (pageId === 'calcular')      renderCalcSelect();
+  if (pageId === 'historico')     renderHistorico();
+  if (pageId === 'configuracoes') renderConfiguracoes();
+}
+
+/* ── UTILITÁRIOS E RELÓGIO ────────────────────────────────── */
+function atualizarRelogio() {
   const agora = new Date();
-  const opts  = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-  document.getElementById('topbarDate').textContent = agora.toLocaleDateString('pt-BR', opts);
+  document.getElementById('topClock').textContent = 
+    agora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) + ' - ' + 
+    agora.toLocaleDateString('pt-BR');
 }
 
-/* ── TOAST ────────────────────────────────────────────────── */
-let toastTimer;
-function mostrarToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+// Formatação de números (ex: 4850 vira 4.850)
+function fmt(n) { return Number(n).toLocaleString('pt-BR', { maximumFractionDigits: 0 }); }
+
+// Escape de HTML para evitar injeção de código
+function esc(s) {
+  if (s === undefined || s === null) return '';
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* ── MOBILE SIDEBAR ───────────────────────────────────────── */
-document.getElementById('menuToggle').addEventListener('click', () => {
-  document.querySelector('.sidebar').classList.toggle('open');
-});
-
-document.getElementById('modalOverlay').addEventListener('click', e => {
-  if (e.target === e.currentTarget) fecharModal();
-});
-
-/* ── HELPERS ──────────────────────────────────────────────── */
-function fmtNum(n) {
-  return Number(n).toLocaleString('pt-BR');
+let toastTmr;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTmr);
+  toastTmr = setTimeout(() => el.classList.remove('show'), 3000);
 }
 
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-/* ── INIT ─────────────────────────────────────────────────── */
-document.querySelectorAll('.nav-item').forEach(item => {
-  item.addEventListener('click', () => {
-    navegarPara(item.dataset.page);
+/* ── INICIALIZAÇÃO E EVENTOS GERAIS ───────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  // Liga os botões do menu
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.addEventListener('click', () => ir(b.dataset.page));
   });
-});
 
-carregarState();
-aplicarTema(state.tema || 'light');
-atualizarData();
-setInterval(atualizarData, 30000);
-navegarPara('dashboard');
+  // Botão hamburguer (Mobile)
+  document.getElementById('ham').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+
+  // Fechar Modal clicando fora dele
+  document.getElementById('modalBg').addEventListener('click', e => {
+    if (e.target === e.currentTarget) fecharModal();
+  });
+
+  // Prepara o sistema
+  load();
+  atualizarRelogio();
+  setInterval(atualizarRelogio, 60000); // Atualiza o relógio a cada minuto
+  ir('dashboard'); // Tela inicial
+});
